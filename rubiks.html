@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Object detector web app</title>
+<link href="https://fonts.googleapis.com/css?family=Yeon+Sung&display=swap" rel="stylesheet"><meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.0.0/p5.js"></script>
+
+<script src="https://unpkg.com/ml5@latest/dist/ml5.min.js"></script>
+<link rel="stylesheet" type="text/css" href="style.css">
+<script src="main.js"></script>
+</head>
+
+<body>
+    <center>
+        <h1 class="btn btn-warning">Object detector web app</h1>
+        <br><br> <a href="index.html" class="btn btn-warning">Back</a> <br><br>
+        <h3 id="status" class="btn btn-danger"></h3>
+        <br>
+        <h3 class="btn btn-success" style="font-size:15px;">
+          There is 1 object in the image from which cocossd model has detected 1 object.
+        </h3>  
+    </center>
+    <script>
+    function setup()
+        {
+            canvas = createCanvas(380, 380);
+            canvas.position(650,300);
+            objectDetector = ml5.objectDetector('cocossd', modelLoaded);
+            document.getElementById("status").innerHTML = "Status : Detecting Objects";
+        }
+        
+        img= "";
+        status1 = "";
+        objects = [];
+        
+       
+        function draw()
+        {
+           image(img, 0, 0, 380, 380);
+           if(status1 != "")
+           {
+            r = random(255);
+            g = random(255);
+            b = random(255);
+            objectDetector.detect(img, gotResult);
+            for(i = 0; i < objects.length; i++)
+            {
+                document.getElementById("status").innerHTML = "Status : Object Detected";
+                document.getElementById("number_of_objects").innerHTML = "Number of objects detected are : "+ objects.length;
+                fill(r,g,b);
+                percent = floor(objects[i].confidence * 100);
+                text(objects[i].label + " "+ percent + "%", objects[i].x, objects[i].y);
+                noFill();
+                stroke(r,g,b);
+                rect(objects[i].x, objects[i].y, objects[i].width, objects[i].height);
+            }
+           }
+          
+        }
+        
+        function modelLoaded()
+        {
+            console.log("Model Loaded!");
+            status1 = true;
+            objectDetector.detect(img, gotResult);
+        }
+        
+        function gotResult(error, results)
+        {
+            if (error) {
+               console.log(error);
+            }
+            console.log(results);
+            objects = results;
+        }
+        
+        function preload()
+        {
+            img = loadImage("rubiks cube.jpg");
+        }
+        </script>
+</body>
+</html>
